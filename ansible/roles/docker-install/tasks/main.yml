@@ -1,0 +1,5 @@
+- name: copy over install prereqs script
+  template: src=install-prereqs.sh dest=/tmp mode=0744
+
+- name: install docker and other prereqs
+  command: /tmp/install-prereqs.sh

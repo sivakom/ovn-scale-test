@@ -1,0 +1,8 @@
+---
+- name: delete skydive container
+  docker:
+    name: ovn-skydive-analyzer
+    image: "{{ skydive_image_full }}"
+    state: absent
+  when:
+    - inventory_hostname in groups['skydive']

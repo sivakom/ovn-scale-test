@@ -31,7 +31,7 @@
                 "type": "OvsSandboxProvider",
                 "credentials": [
                     {
-                        "host": "{{ hostvars[host]['provider_ip'] }}",
+                        "host": "{{ hostvars[host]['ansible_default_ipv4']['address'] }}",
                         "user": "root"
                     }
                 ]

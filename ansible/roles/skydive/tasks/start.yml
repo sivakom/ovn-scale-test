@@ -1,0 +1,61 @@
+---
+- name: start skydive analyzer
+  docker:
+    name: ovn-skydive-analyzer
+    image: "{{ skydive_image_full }}"
+    pull: "{{ image_pull_policy }}"
+    privileged: yes
+    detach: True
+    state: started
+    ports:
+      - 8082:8082
+      - 9200:9200
+  when:
+    - inventory_hostname in groups['skydive']
+
+- name: copy skydive config file into analyzer
+  command: "docker cp {{ node_config_directory }}/skydive.yml ovn-skydive-analyzer:{{ skydive_dir }}/etc"
+  when:
+    - inventory_hostname in groups['skydive']
+
+- name: copy skydive config file into agents
+  command: "docker cp {{ node_config_directory }}/skydive.yml sandbox-{{ item.1 }}:{{ skydive_dir }}/etc"
+  delegate_to: "{{ groups['emulation-hosts'][ item.0 ] }}"
+  with_together:
+        - "{{ dmi_data['ip_index'] }}"
+        - "{{ dmi_data['ip_index_list'] }}"
+  when:
+    - inventory_hostname in groups['emulation-hosts']
+
+- name: run skydive analyzer
+  command: "docker exec -dit ovn-skydive-analyzer skydive analyzer --conf {{ skydive_dir }}/etc/skydive.yml"
+  when:
+    - inventory_hostname in groups['skydive']
+
+# - name: make sure agents listen on unique ports
+#   shell: "docker exec -it sandbox-{{ item.1 }} sed -i 's/  listen: 8081/  listen: {{ item }}/g'"
+#   delegate_to: "{{ groups['emulation-hosts'][ item.0 ] }}"
+#   with_together:
+#         - "{{ dmi_data['ip_index'] }}"
+#         - "{{ dmi_data['ip_index_list'] }}"
+#   when:
+#     - inventory_hostname in groups['emulation-hosts']
+
+- name: make sure agents are named differently
+  shell: "docker exec -dit sandbox-{{ item.1 }} sed -i \"s/host_id:$/host_id: sandbox-{{ item.1 }}/g\" {{ skydive_dir }}/etc/skydive.yml"
+  delegate_to: "{{ groups['emulation-hosts'][ item.0 ] }}"
+  with_together:
+        - "{{ dmi_data['ip_index'] }}"
+        - "{{ dmi_data['ip_index_list'] }}"
+  when:
+    - inventory_hostname in groups['emulation-hosts']
+
+# - name: run skydive agents
+#   command: "docker exec -dit sandbox-{{ item.1 }} skydive agent --conf {{ skydive_dir }}/etc/skydive.yml"
+#   delegate_to: "{{ groups['emulation-hosts'][ item.0 ] }}"
+#   with_together:
+#         - "{{ dmi_data['ip_index'] }}"
+#         - "{{ dmi_data['ip_index_list'] }}"
+#   when:
+#     - inventory_hostname in groups['emulation-hosts']
+

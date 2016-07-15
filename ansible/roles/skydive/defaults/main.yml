@@ -1,0 +1,4 @@
+---
+skydive_image_full: "{{ skydive_image }}"
+skydive_dir: /go/src/github.com/redhat-cip/skydive
+skydive_analyzer_ip: 127.0.0.1

@@ -29,4 +29,17 @@ RUN chmod 755 /bin/ovn-sandbox-north-ovsdb.sh \
               /bin/ovn-sandbox-south-ovsdb.sh \
               /bin/ovn-sandbox-northd.sh
 
+# Install Skydive Agent
+
+RUN mkdir -p $GOPATH/src/github.com/redhat-cip
+RUN git clone https://github.com/sivakom/skydive.git $GOPATH/src/github.com/redhat-cip/skydive
+RUN cd $GOPATH/src/github.com/redhat-cip \
+    && godep save \
+    && cd $GOPATH/src/github.com/redhat-cip/skydive \
+    && make install
+# RUN cd
+# to change the config, can either use sed or clone a custom copy of skydive
+# for now, will use my local fork.
+# RUN $GOPATH/bin/skydive agent --conf $GOPATH/src/github.com/redhat-cip/skydive/etc/skydive.yml
+
 # ENTRYPOINT ["/usr/local/bin/ovn_set_database"]

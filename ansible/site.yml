@@ -1,5 +1,11 @@
 ---
 - hosts:
+     - all # install wherever docker is needed
+  roles:
+    - { role: docker,
+        when: enable_docker_install | bool }
+
+- hosts:
     - ovn-control
     - emulation-hosts
   roles:
@@ -12,3 +18,9 @@
     - { role: common }
     - { role: rally,
         when: enable_rally_ovs | bool }
+
+- hosts:
+    - skydive
+    - emulation-hosts
+  roles:
+    - skydive

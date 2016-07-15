@@ -1,4 +1,4 @@
-SUBDIRS = base ovn rally
+SUBDIRS = base ovn rally skydive
 
 subdirs:
 	for dir in $(SUBDIRS); do \

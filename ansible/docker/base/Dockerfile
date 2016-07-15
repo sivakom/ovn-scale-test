@@ -36,3 +36,21 @@ RUN apt-get install -y --no-install-recommends \
 
 # DO NOT commit; the following are for debugging purpose
 RUN apt-get install emacs screen openssh-client -y
+
+# Needed for skydive
+
+# gcc for cgo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		g++ \
+		gcc \
+		libc6-dev
+
+RUN apt-get install software-properties-common -y \
+    && add-apt-repository ppa:ubuntu-lxc/lxd-stable \
+    && apt-get update \
+    && apt-get install golang -y
+
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:$PATH
+RUN go get github.com/tools/godep
+RUN apt-get install libpcap-dev -y
